@@ -14,10 +14,6 @@ const commands = [
     ),
 
   new SlashCommandBuilder()
-    .setName("ticket")
-    .setDescription("Sukurti support ticket"),
-
-  new SlashCommandBuilder()
     .setName("mcstatus")
     .setDescription("Minecraft serverio statusas")
 ].map(cmd => cmd.toJSON());
