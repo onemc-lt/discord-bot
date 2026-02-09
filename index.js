@@ -9,7 +9,7 @@ const TOKEN = process.env.TOKEN;
 
 // ⬇️ SVARBU
 const CHANNEL_ID = "1470099282735661068"; // tavo kanalas
-const MESSAGE_ID = "CIA_IDESI_ZINUTES_ID"; // 👈 PAKEISI
+const MESSAGE_ID = "https://discord.com/channels/1470032921896288340/1470099282735661068/1470495900618068010"; // 👈 PAKEISI
 
 const MC_HOST = "play.onemc.lt";
 const MC_PORT = 25565;
