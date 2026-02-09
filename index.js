@@ -1,5 +1,5 @@
-const { Client, GatewayIntentBits } = require("discord.js");
-const fetch = require("node-fetch");
+import { Client, GatewayIntentBits } from "discord.js";
+import fetch from "node-fetch";
 
 // ====== KONFIGŪRACIJA ======
 const TOKEN = process.env.TOKEN;
@@ -7,11 +7,7 @@ const TOKEN = process.env.TOKEN;
 const MC_HOST = "play.onemc.lt";
 const MC_VERSION = "1.21.x";
 
-// Kanalo ID
 const CHANNEL_ID = "1470099282735661068";
-
-// Jei nori redaguoti tą pačią žinutę – įrašyk jos ID
-// Jei paliksi null → botas sukurs naują
 const MESSAGE_ID = null;
 // ===========================
 
@@ -30,8 +26,7 @@ process.on("uncaughtException", err => {
 async function updateMcStatus() {
   try {
     const res = await fetch(
-      `https://api.mcstatus.io/v2/status/java/${MC_HOST}`,
-      { timeout: 10000 }
+      `https://api.mcstatus.io/v2/status/java/${MC_HOST}`
     );
     const data = await res.json();
 
@@ -39,13 +34,10 @@ async function updateMcStatus() {
     if (!channel) return;
 
     let message = null;
-
     if (MESSAGE_ID) {
       try {
         message = await channel.messages.fetch(MESSAGE_ID);
-      } catch {
-        message = null;
-      }
+      } catch {}
     }
 
     let content = `**OneMc.lt**
@@ -77,10 +69,8 @@ ${data.players.online}/${data.players.max}`;
 
 client.once("ready", () => {
   console.log(`Prisijungta kaip ${client.user.tag}`);
-
-  updateMcStatus();              // iškart
-  setInterval(updateMcStatus, 60_000); // kas 1 minutę
+  updateMcStatus();
+  setInterval(updateMcStatus, 60_000);
 });
 
 client.login(TOKEN);
-
