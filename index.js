@@ -1,68 +1,72 @@
 import { Client, GatewayIntentBits, EmbedBuilder } from "discord.js";
-import { status } from "minecraft-server-util";
 
+const TOKEN = process.env.TOKEN;
+
+// ===== Minecraft =====
+const MC_HOST = "play.onemc.lt";
+const MC_VERSION = "1.21.x";
+
+// ===== Discord =====
+const CHANNEL_ID = "1470099282735661068";
+
+// ===== Client =====
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
 });
 
-const TOKEN = process.env.TOKEN;
+let statusMessage = null;
 
-// ⬇️ SVARBU
-const CHANNEL_ID = "1470099282735661068"; // tavo kanalas
-const MESSAGE_ID = "https://discord.com/channels/1470032921896288340/1470099282735661068/1470495994264293620"; // 👈 PAKEISI
-
-const MC_HOST = "playonemc.falixsrv.me";
-const MC_PORT = 21449;
+// ===== Minecraft status =====
+async function getMcStatus() {
+  const res = await fetch(`https://api.mcstatus.io/v2/status/java/${MC_HOST}`);
+  if (!res.ok) throw new Error(`${res.status}: ${res.statusText}`);
+  return res.json();
+}
 
 async function updateMcStatus() {
   try {
+    const data = await getMcStatus();
     const channel = await client.channels.fetch(CHANNEL_ID);
     if (!channel) return;
 
-    const message = await channel.messages.fetch(MESSAGE_ID);
+    const embed = new EmbedBuilder()
+      .setTitle("OneMc.lt")
+      .setColor(data.online ? 0x2ecc71 : 0xe74c3c)
+      .addFields(
+        { name: "IP", value: MC_HOST, inline: true },
+        { name: "Version", value: MC_VERSION, inline: true },
+        {
+          name: "Statusas",
+          value: data.online
+            ? `🟢 Online\n👥 ${data.players.online}/${data.players.max}`
+            : "🔴 Offline"
+        }
+      )
+      .setFooter({ text: "Atnaujinama kas 1 minutę" })
+      .setTimestamp();
 
-    let embed;
-
-    try {
-      const res = await status(MC_HOST, MC_PORT);
-
-      embed = new EmbedBuilder()
-        .setColor(0x2ecc71)
-        .setTitle("🟢 OneMc.lt")
-        .setDescription(
-          `**IP:** play.onemc.lt\n` +
-          `**Versija:** 1.21.x\n\n` +
-          `**STATUSAS:** Online\n` +
-          `**ŽAIDĖJAI:** ${res.players.online}/${res.players.max}`
-        )
-        .setFooter({ text: "Atnaujinama kas 1 minutę" })
-        .setTimestamp();
-
-    } catch {
-      embed = new EmbedBuilder()
-        .setColor(0xe74c3c)
-        .setTitle("🔴 OneMc.lt")
-        .setDescription(
-          `**IP:** play.onemc.lt\n` +
-          `**Versija:** 1.21.x\n\n` +
-          `**STATUSAS:** Offline`
-        )
-        .setFooter({ text: "Atnaujinama kas 1 minutę" })
-        .setTimestamp();
+    // jei dar neturim žinutės – ieškom paskutinės
+    if (!statusMessage) {
+      const messages = await channel.messages.fetch({ limit: 5 });
+      statusMessage = messages.find(m => m.author.id === client.user.id) || null;
     }
 
-    await message.edit({ embeds: [embed] });
+    if (statusMessage) {
+      await statusMessage.edit({ embeds: [embed] });
+    } else {
+      statusMessage = await channel.send({ embeds: [embed] });
+    }
 
   } catch (err) {
     console.error("MC status klaida:", err.message);
   }
 }
 
-client.once("ready", async () => {
+client.once("ready", () => {
   console.log(`Prisijungta kaip ${client.user.tag}`);
-
   updateMcStatus();
   setInterval(updateMcStatus, 60_000);
 });
 
 client.login(TOKEN);
+
