@@ -1,5 +1,4 @@
 import { Client, GatewayIntentBits } from "discord.js";
-import fetch from "node-fetch";
 
 // ====== KONFIGŪRACIJA ======
 const TOKEN = process.env.TOKEN;
