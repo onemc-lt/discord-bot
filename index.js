@@ -1,73 +1,89 @@
-const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, PermissionsBitField } = require("discord.js");
-const mc = require("minecraft-server-util");
+const { Client, GatewayIntentBits } = require("discord.js");
+const fetch = require("node-fetch");
+
+// ====== KONFIGŪRACIJA ======
+const TOKEN = process.env.TOKEN;
+
+const MC_HOST = "play.onemc.lt";
+const MC_VERSION = "1.21.x";
+
+// Kur bus siunčiama / redaguojama žinutė
+const CHANNEL_ID = "1470099282735661068";
+
+// Jei nori redaguoti tą pačią žinutę – įrašyk jos ID
+// Jei paliksi null → botas sukurs naują žinutę
+const MESSAGE_ID = null; // pvz: "123456789012345678"
+// ===========================
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages]
+  intents: [GatewayIntentBits.Guilds]
 });
 
-const TOKEN = process.env.TOKEN;
-const MC_IP = "playonemc.falixsrv.me"; // pvz. play.serveris.lt
-const MC_PORT = 21449;
+// Apsauga nuo crash
+process.on("unhandledRejection", err => {
+  console.error("Unhandled Rejection:", err);
+});
+process.on("uncaughtException", err => {
+  console.error("Uncaught Exception:", err);
+});
+
+async function updateMcStatus() {
+  try {
+    const res = await fetch(`https://api.mcstatus.io/v2/status/java/${MC_HOST}`, {
+      timeout: 10000
+    });
+    const data = await res.json();
+
+    const channel = await client.channels.fetch(CHANNEL_ID);
+    if (!channel) return;
+
+    let message = null;
+
+    if (MESSAGE_ID) {
+      try {
+        message = await channel.messages.fetch(MESSAGE_ID);
+      } catch {
+        message = null;
+      }
+    }
+
+    let content = `**OneMc.lt**
+
+IP: ${MC_HOST}
+Version: ${MC_VERSION}
+
+`;
+
+    if (!data.online) {
+      content += `🔴 **STATUSAS:** Offline`;
+    } else {
+      content += `🟢 **STATUSAS:** Online
+
+👥 **ŽAIDĖJAI:**
+${data.players.online}/${data.players.max}`;
+    }
+
+    if (message) {
+      await message.edit(content);
+    } else {
+      await channel.send(content);
+    }
+
+  } catch (err) {
+    console.error("MC status klaida:", err);
+  }
+}
 
 client.once("ready", () => {
   console.log(`Prisijungta kaip ${client.user.tag}`);
+
+  updateMcStatus(); // iškart
+  setInterval(updateMcStatus, 60_000); // kas 1 minutę
 });
 
-client.on("interactionCreate", async interaction => {
-  if (!interaction.isChatInputCommand()) return;
+client.login(TOKEN);
+;
 
-  // 📢 ANNOUNCE
-  if (interaction.commandName === "announce") {
-    const text = interaction.options.getString("text");
-    const image = interaction.options.getString("image");
-
-    const embed = new EmbedBuilder()
-      .setTitle("📢 Pranešimas")
-      .setDescription(text)
-      .setColor("Green")
-      .setImage(image)
-      .setTimestamp();
-
-    await interaction.reply({ embeds: [embed] });
-  }
-
-  // 🎫 TICKET
-  if (interaction.commandName === "ticket") {
-    const channel = await interaction.guild.channels.create({
-      name: `ticket-${interaction.user.username}`,
-      type: ChannelType.GuildText,
-      permissionOverwrites: [
-        {
-          id: interaction.guild.id,
-          deny: [PermissionsBitField.Flags.ViewChannel],
-        },
-        {
-          id: interaction.user.id,
-          allow: [PermissionsBitField.Flags.ViewChannel],
-        },
-      ],
-    });
-
-    await channel.send(`🎫 Sveiki ${interaction.user}, aprašykite savo problemą.`);
-    await interaction.reply({ content: `Ticket sukurtas: ${channel}`, ephemeral: true });
-  }
-
-  // ⛏️ MC STATUS
-  if (interaction.commandName === "mcstatus") {
-    try {
-      const status = await mc.status(MC_IP, MC_PORT);
-      const embed = new EmbedBuilder()
-        .setTitle("⛏️ Minecraft Serveris")
-        .setColor("Blue")
-        .addFields(
-          { name: "Statusas", value: "🟢 Online", inline: true },
-          { name: "Žaidėjai", value: `${status.players.online}/${status.players.max}`, inline: true }
-        );
-
-      await interaction.reply({ embeds: [embed] });
-    } catch {
-      await interaction.reply("🔴 Serveris offline");
-    }
   }
 });
 
