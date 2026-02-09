@@ -7,12 +7,12 @@ const TOKEN = process.env.TOKEN;
 const MC_HOST = "play.onemc.lt";
 const MC_VERSION = "1.21.x";
 
-// Kur bus siunčiama / redaguojama žinutė
+// Kanalo ID
 const CHANNEL_ID = "1470099282735661068";
 
 // Jei nori redaguoti tą pačią žinutę – įrašyk jos ID
-// Jei paliksi null → botas sukurs naują žinutę
-const MESSAGE_ID = null; // pvz: "123456789012345678"
+// Jei paliksi null → botas sukurs naują
+const MESSAGE_ID = null;
 // ===========================
 
 const client = new Client({
@@ -29,9 +29,10 @@ process.on("uncaughtException", err => {
 
 async function updateMcStatus() {
   try {
-    const res = await fetch(`https://api.mcstatus.io/v2/status/java/${MC_HOST}`, {
-      timeout: 10000
-    });
+    const res = await fetch(
+      `https://api.mcstatus.io/v2/status/java/${MC_HOST}`,
+      { timeout: 10000 }
+    );
     const data = await res.json();
 
     const channel = await client.channels.fetch(CHANNEL_ID);
@@ -77,14 +78,9 @@ ${data.players.online}/${data.players.max}`;
 client.once("ready", () => {
   console.log(`Prisijungta kaip ${client.user.tag}`);
 
-  updateMcStatus(); // iškart
+  updateMcStatus();              // iškart
   setInterval(updateMcStatus, 60_000); // kas 1 minutę
 });
 
 client.login(TOKEN);
-;
 
-  }
-});
-
-client.login(TOKEN);
