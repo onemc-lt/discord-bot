@@ -1,73 +1,66 @@
-import { Client, GatewayIntentBits } from "discord.js";
-
-// ====== KONFIGŪRACIJA ======
-const TOKEN = process.env.TOKEN;
-
-const MC_HOST = "play.onemc.lt";
-const MC_VERSION = "1.21.x";
-
-const CHANNEL_ID = "1470099282735661068";
-const MESSAGE_ID = null;
-// ===========================
+import { Client, GatewayIntentBits, EmbedBuilder } from "discord.js";
+import { status } from "minecraft-server-util";
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
 });
 
-// Apsauga nuo crash
-process.on("unhandledRejection", err => {
-  console.error("Unhandled Rejection:", err);
-});
-process.on("uncaughtException", err => {
-  console.error("Uncaught Exception:", err);
-});
+const TOKEN = process.env.TOKEN;
+
+// ⬇️ SVARBU
+const CHANNEL_ID = "1470099282735661068"; // tavo kanalas
+const MESSAGE_ID = "CIA_IDESI_ZINUTES_ID"; // 👈 PAKEISI
+
+const MC_HOST = "play.onemc.lt";
+const MC_PORT = 25565;
 
 async function updateMcStatus() {
   try {
-    const res = await fetch(
-      `https://api.mcstatus.io/v2/status/java/${MC_HOST}`
-    );
-    const data = await res.json();
-
     const channel = await client.channels.fetch(CHANNEL_ID);
     if (!channel) return;
 
-    let message = null;
-    if (MESSAGE_ID) {
-      try {
-        message = await channel.messages.fetch(MESSAGE_ID);
-      } catch {}
+    const message = await channel.messages.fetch(MESSAGE_ID);
+
+    let embed;
+
+    try {
+      const res = await status(MC_HOST, MC_PORT);
+
+      embed = new EmbedBuilder()
+        .setColor(0x2ecc71)
+        .setTitle("🟢 OneMc.lt")
+        .setDescription(
+          `**IP:** play.onemc.lt\n` +
+          `**Versija:** 1.21.x\n\n` +
+          `**STATUSAS:** Online\n` +
+          `**ŽAIDĖJAI:** ${res.players.online}/${res.players.max}`
+        )
+        .setFooter({ text: "Atnaujinama kas 1 minutę" })
+        .setTimestamp();
+
+    } catch {
+      embed = new EmbedBuilder()
+        .setColor(0xe74c3c)
+        .setTitle("🔴 OneMc.lt")
+        .setDescription(
+          `**IP:** play.onemc.lt\n` +
+          `**Versija:** 1.21.x\n\n` +
+          `**STATUSAS:** Offline`
+        )
+        .setFooter({ text: "Atnaujinama kas 1 minutę" })
+        .setTimestamp();
     }
 
-    let content = `**OneMc.lt**
-
-IP: ${MC_HOST}
-Version: ${MC_VERSION}
-
-`;
-
-    if (!data.online) {
-      content += `🔴 **STATUSAS:** Offline`;
-    } else {
-      content += `🟢 **STATUSAS:** Online
-
-👥 **ŽAIDĖJAI:**
-${data.players.online}/${data.players.max}`;
-    }
-
-    if (message) {
-      await message.edit(content);
-    } else {
-      await channel.send(content);
-    }
+    await message.edit({ embeds: [embed] });
 
   } catch (err) {
-    console.error("MC status klaida:", err);
+    console.error("MC status klaida:", err.message);
   }
 }
 
-client.once("ready", () => {
+client.once("ready", async () => {
   console.log(`Prisijungta kaip ${client.user.tag}`);
+
   updateMcStatus();
   setInterval(updateMcStatus, 60_000);
 });
