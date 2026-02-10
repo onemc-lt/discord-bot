@@ -56,20 +56,20 @@ async function updateMcStatus() {
         .setFooter({ text: "Atnaujinama kas 1 minutę" })
         .setTimestamp();
 
-    } catch (err) {
-      // jei serveris offline arba fetch error
-      embed = new EmbedBuilder()
-        .setTitle("🔴 OneMc.lt statusas")
-        .setColor(0xe74c3c)
-        .addFields(
-          { name: "IP:", value: MC_HOST, inline: true },
-          { name: "Version:", value: MC_VERSION, inline: true },
-          { name: "Statusas:", value: "🔴 Offline", inline: true }
-          { name: "Žaidėjai:", value: `${data.players.online}/${data.players.max}`, inline: true }
-        )
-        .setFooter({ text: "Atnaujinama kas 1 minutę" })
-        .setTimestamp();
-    }
+  } catch (err) {
+  embed = new EmbedBuilder()
+    .setTitle("🔴 OneMc.lt statusas")
+    .setColor(0xe74c3c)
+    .addFields(
+      { name: "IP:", value: MC_HOST, inline: true },
+      { name: "Versija:", value: MC_VERSION, inline: true },
+      { name: "Statusas:", value: "🔴 Offline", inline: true },
+      { name: "Žaidėjai:", value: "0/64", inline: true }
+    )
+    .setFooter({ text: "Atnaujinama kas 1 minutę" })
+    .setTimestamp();
+}
+
 
     // jei radome seną žinutę – redaguojame
     if (statusMessage) {
