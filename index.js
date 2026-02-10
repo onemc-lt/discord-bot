@@ -3,8 +3,8 @@ import { Client, GatewayIntentBits, EmbedBuilder } from "discord.js";
 const TOKEN = process.env.TOKEN;
 
 // █ Minecraft
-const MC_HOST = "play.onemc.lt";
-const MC_VERSION = "1.21.x";
+const MC_HOST = "playonemc.falixsrv.me";
+const MC_VERSION = "1.21.11";
 
 // █ Discord
 const CHANNEL_ID = "1470099282735661068";
@@ -45,7 +45,7 @@ async function updateMcStatus() {
       const data = await getMcStatus();
 
       embed = new EmbedBuilder()
-        .setTitle("🟢 OneMc.lt Minecraft serverio statusas")
+        .setTitle("🟢 OneMc.lt statusas")
         .setColor(0x2ecc71)
         .addFields(
           { name: "IP:", value: MC_HOST, inline: true },
@@ -59,12 +59,13 @@ async function updateMcStatus() {
     } catch (err) {
       // jei serveris offline arba fetch error
       embed = new EmbedBuilder()
-        .setTitle("🔴 OneMc.lt Minecraft serverio statusas")
+        .setTitle("🔴 OneMc.lt statusas")
         .setColor(0xe74c3c)
         .addFields(
           { name: "IP:", value: MC_HOST, inline: true },
           { name: "Version:", value: MC_VERSION, inline: true },
           { name: "Statusas:", value: "🔴 Offline", inline: true }
+          { name: "Žaidėjai:", value: `${data.players.online}/${data.players.max}`, inline: true }
         )
         .setFooter({ text: "Atnaujinama kas 1 minutę" })
         .setTimestamp();
