@@ -1,4 +1,5 @@
 import { Client, GatewayIntentBits, EmbedBuilder } from "discord.js";
+import fetch from "node-fetch";
 
 const TOKEN = process.env.TOKEN;
 
@@ -16,13 +17,9 @@ const client = new Client({
 let statusMessage = null;
 
 async function getMcStatus() {
-  try {
-    const res = await fetch(`https://api.mcstatus.io/v2/status/java/${MC_HOST}`);
-    if (!res.ok) throw new Error(`${res.status}`);
-    return res.json();
-  } catch (err) {
-    throw err;
-  }
+  const res = await fetch(`https://api.mcstatus.io/v2/status/java/${MC_HOST}`);
+  if (!res.ok) throw new Error("Server offline");
+  return res.json();
 }
 
 async function updateMcStatus() {
@@ -30,79 +27,77 @@ async function updateMcStatus() {
     const channel = await client.channels.fetch(CHANNEL_ID);
     if (!channel) return;
 
-    // jei neturim žinutės dar – ieškome paskutinės bot žinutės
+    // randam seną bot žinutę
     if (!statusMessage) {
       const messages = await channel.messages.fetch({ limit: 20 });
       statusMessage = messages.find(
-        msg => msg.author.id === client.user.id && msg.embeds.length > 0
+        m => m.author.id === client.user.id && m.embeds.length > 0
       ) || null;
     }
 
     let embed;
 
-    // bandome gauti serverio info
     try {
+      // 🟢 ONLINE
       const data = await getMcStatus();
 
       embed = new EmbedBuilder()
-  .setTitle("🟢 OneMc.lt Statusas 🟢")
-  .setColor(0x2ecc71)
-  .setDescription(
-    "**🌍 Serverio IP:**\n" +
-    "```playonemc.falixsrv```\n" +
-    "**📦 Versija:** 1.21.11"
-  )
-  .addFields(
-    {
-      name: "📊 Serverio būsena",
-      value: "**🟢 ONLINE**",
-      inline: false
-    },
-    {
-      name: "👥 Žaidėjai",
-      value: `**${data.players.online} / 64**`,
-      inline: false
+        .setTitle("🟢 OneMc.lt Statusas")
+        .setColor(0x2ecc71)
+        .setDescription(
+          "**🌍 Serverio IP:**\n" +
+          "```playonemc.falixsrv.me```\n" +
+          `**📦 Versija:** ${MC_VERSION}`
+        )
+        .addFields(
+          {
+            name: "📊 Serverio būsena",
+            value: "**🟢 ONLINE**",
+            inline: false
+          },
+          {
+            name: "👥 Žaidėjai",
+            value: `**${data.players.online} / 64**`,
+            inline: false
+          }
+        )
+        .setFooter({ text: "🔄 Atnaujinama kas 1 minutę" })
+        .setTimestamp();
+
+    } catch {
+      // 🔴 OFFLINE
+      embed = new EmbedBuilder()
+        .setTitle("🔴 OneMc.lt Statusas")
+        .setColor(0xe74c3c)
+        .setDescription(
+          "**🌍 Serverio IP:**\n" +
+          "```playonemc.falixsrv.me```\n" +
+          `**📦 Versija:** ${MC_VERSION}`
+        )
+        .addFields(
+          {
+            name: "📊 Serverio būsena",
+            value: "**🔴 OFFLINE**",
+            inline: false
+          },
+          {
+            name: "👥 Žaidėjai",
+            value: "**0 / 64**",
+            inline: false
+          }
+        )
+        .setFooter({ text: "🔄 Atnaujinama kas 1 minutę" })
+        .setTimestamp();
     }
-  )
-  .setFooter({ text: "🔄 Atnaujinama kas 1 minutę" })
-  .setTimestamp();
 
-
-  } catch (err) {
-embed = new EmbedBuilder()
-  .setTitle("🔴 OneMc.lt Statusas 🔴")
-  .setColor(0xe74c3c)
-  .setDescription(
-    "**🌍 Serverio IP:**\n" +
-    "```playonemc.falixsrv.me```\n" +
-    "**📦 Versija:** 1.21.11"
-  )
-  .addFields(
-    {
-      name: "📊 Serverio būsena",
-      value: "**🔴 OFFLINE**",
-      inline: false
-    },
-    {
-      name: "👥 Žaidėjai",
-      value: "**0 / 64**",
-      inline: false
-    }
-  )
-  .setFooter({ text: "🔄 Atnaujinama kas 1 minutę" })
-  .setTimestamp();
-
-
-    // jei radome seną žinutę – redaguojame
+    // redaguojam arba kuriam
     if (statusMessage) {
       try {
         await statusMessage.edit({ embeds: [embed] });
       } catch {
-        // jei redagavimas nepavyksta (pvz. žinutė ištrinta) – sukuriame naują
         statusMessage = await channel.send({ embeds: [embed] });
       }
     } else {
-      // jei neturim jokios – kuriam naują
       statusMessage = await channel.send({ embeds: [embed] });
     }
 
@@ -113,11 +108,8 @@ embed = new EmbedBuilder()
 
 client.once("ready", () => {
   console.log(`Prisijungta kaip ${client.user.tag}`);
-  // iškarto atnaujinam statusą
   updateMcStatus();
-
-  // ir toliau atnaujinam kas minutę
-  setInterval(updateMcStatus, 60 * 1000); // 60s
+  setInterval(updateMcStatus, 60_000);
 });
 
 client.login(TOKEN);
