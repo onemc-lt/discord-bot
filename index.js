@@ -45,30 +45,52 @@ async function updateMcStatus() {
       const data = await getMcStatus();
 
       embed = new EmbedBuilder()
-        .setTitle("🟢 OneMc.lt statusas")
-        .setColor(0x2ecc71)
-        .addFields(
-          { name: "IP:", value: MC_HOST, inline: true },
-          { name: "Version:", value: MC_VERSION, inline: true },
-          { name: "Statusas:", value: "🟢 Online", inline: true },
-          { name: "Žaidėjai:", value: `${data.players.online}/${data.players.max}`, inline: true }
-        )
-        .setFooter({ text: "Atnaujinama kas 1 minutę" })
-        .setTimestamp();
+  .setTitle("🟢 OneMc.lt Statusas 🟢")
+  .setColor(0x2ecc71)
+  .setDescription(
+    "**🌍 Serverio IP:**\n" +
+    "```playonemc.falixsrv```\n" +
+    "**📦 Versija:** 1.21.11"
+  )
+  .addFields(
+    {
+      name: "📊 Serverio būsena",
+      value: "**🟢 ONLINE**",
+      inline: false
+    },
+    {
+      name: "👥 Žaidėjai",
+      value: `**${data.players.online} / 64**`,
+      inline: false
+    }
+  )
+  .setFooter({ text: "🔄 Atnaujinama kas 1 minutę" })
+  .setTimestamp();
+
 
   } catch (err) {
-  embed = new EmbedBuilder()
-    .setTitle("🔴 OneMc.lt statusas")
-    .setColor(0xe74c3c)
-    .addFields(
-      { name: "IP:", value: MC_HOST, inline: true },
-      { name: "Versija:", value: MC_VERSION, inline: true },
-      { name: "Statusas:", value: "🔴 Offline", inline: true },
-      { name: "Žaidėjai:", value: "0/64", inline: true }
-    )
-    .setFooter({ text: "Atnaujinama kas 1 minutę" })
-    .setTimestamp();
-}
+embed = new EmbedBuilder()
+  .setTitle("🔴 OneMc.lt Statusas 🔴")
+  .setColor(0xe74c3c)
+  .setDescription(
+    "**🌍 Serverio IP:**\n" +
+    "```playonemc.falixsrv.me```\n" +
+    "**📦 Versija:** 1.21.11"
+  )
+  .addFields(
+    {
+      name: "📊 Serverio būsena",
+      value: "**🔴 OFFLINE**",
+      inline: false
+    },
+    {
+      name: "👥 Žaidėjai",
+      value: "**0 / 64**",
+      inline: false
+    }
+  )
+  .setFooter({ text: "🔄 Atnaujinama kas 1 minutę" })
+  .setTimestamp();
 
 
     // jei radome seną žinutę – redaguojame
