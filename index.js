@@ -7,7 +7,9 @@ const MC_HOST = "playonemc.falixsrv.me";
 const MC_VERSION = "1.21.11";
 
 // █ Discord
-const CHANNEL_ID = "1470099282735661068";
+const STATUS_CHANNEL_ID = "1470099282735661068"; // statusas
+const ANNOUNCE_CHANNEL_ID = "1470034064290615510"; // announcement
+
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
@@ -33,7 +35,7 @@ async function getMcStatus() {
 // =====================
 async function updateMcStatus() {
   try {
-    const channel = await client.channels.fetch(CHANNEL_ID);
+    const channel = await client.channels.fetch(STATUS_CHANNEL_ID);
     if (!channel) return;
 
     // randam seną statuso žinutę
@@ -118,6 +120,54 @@ async function updateMcStatus() {
   }
 }
 
+import { PermissionsBitField } from "discord.js";
+
+// =====================
+// ANNOUNCE COMMAND
+// =====================
+client.on("interactionCreate", async interaction => {
+  if (!interaction.isChatInputCommand()) return;
+  if (interaction.commandName !== "announce") return;
+
+  // 🔒 Tik administratoriai
+  if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+    return interaction.reply({
+      content: "❌ Šią komandą gali naudoti tik administratoriai.",
+      ephemeral: true
+    });
+  }
+
+  const title = interaction.options.getString("title");
+  const tekstas = interaction.options.getString("tekstas");
+  const paveikslelis = interaction.options.getString("paveikslelis");
+
+  const channel = await client.channels.fetch(ANNOUNCE_CHANNEL_ID);
+  if (!channel) {
+    return interaction.reply({
+      content: "❌ Announcement kanalas nerastas.",
+      ephemeral: true
+    });
+  }
+
+  const embed = new EmbedBuilder()
+    .setTitle(title)
+    .setDescription(tekstas)
+    .setColor(0x3498db)
+    .setTimestamp();
+
+  if (paveikslelis) {
+    embed.setImage(paveikslelis);
+  }
+
+  await channel.send({ embeds: [embed] });
+
+  await interaction.reply({
+    content: "✅ Announcement išsiųstas.",
+    ephemeral: true
+  });
+});
+
+
 // =====================
 // READY
 // =====================
@@ -128,3 +178,4 @@ client.once("ready", () => {
 });
 
 client.login(TOKEN);
+
