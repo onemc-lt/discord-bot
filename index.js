@@ -75,7 +75,7 @@ if (!data.online) {
         .setFooter({ text: "🔄 Atnaujinama kas 1 minutę" })
         .setTimestamp();
 
-    } catch {
+    } catch (err) {
       // 🔴 OFFLINE
       embed = new EmbedBuilder()
         .setTitle("# 🔴 OneMc.lt Statusas 🔴")
