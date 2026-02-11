@@ -15,31 +15,34 @@ const client = new Client({
 
 let statusMessage = null;
 
+// =====================
+// MC STATUS
+// =====================
 async function getMcStatus() {
   const res = await fetch(`https://api.mcstatus.io/v2/status/java/${MC_HOST}`);
   if (!res.ok) throw new Error("Fetch failed");
 
   const data = await res.json();
-
-  // 🔴 jei serveris offline
-  if (!data.online) {
-    throw new Error("Server offline");
-  }
+  if (!data.online) throw new Error("Server offline");
 
   return data;
 }
 
+// =====================
+// UPDATE STATUS
+// =====================
 async function updateMcStatus() {
   try {
     const channel = await client.channels.fetch(CHANNEL_ID);
     if (!channel) return;
 
-    // randam seną bot žinutę
+    // randam seną statuso žinutę
     if (!statusMessage) {
       const messages = await channel.messages.fetch({ limit: 20 });
-      statusMessage = messages.find(
-        m => m.author.id === client.user.id && m.embeds.length > 0
-      ) || null;
+      statusMessage =
+        messages.find(
+          m => m.author.id === client.user.id && m.embeds.length > 0
+        ) || null;
     }
 
     let embed;
@@ -48,52 +51,49 @@ async function updateMcStatus() {
       // 🟢 ONLINE
       const data = await getMcStatus();
 
-if (!data.online) {
-  throw new Error("Server offline");
       embed = new EmbedBuilder()
-        
-        .setTitle("#🟢 OneMc.lt Statusas 🟢")
+        .setTitle("🟢 OneMc.lt Statusas 🟢")
         .setColor(0x2ecc71)
         .setDescription(
           "**🌍 Serverio IP:**\n" +
-          "```playonemc.falixsrv.me```\n" +
+          "`playonemc.falixsrv.me`\n\n" +
           "**📦 Versija:**\n" +
-          "`" + MC_VERSION + "`\n"
+          "`" + MC_VERSION + "`"
         )
         .addFields(
           {
-            name: "**📊 Serverio būsena:**",
+            name: "📊 Serverio būsena",
             value: "🟢 ONLINE",
             inline: false
           },
           {
-            name: "**👥 Žaidėjai:**",
-            value: `${data.players.online} / 64`,
+            name: "👥 Žaidėjai",
+            value: `**${data.players.online} / 64**`,
             inline: false
           }
         )
         .setFooter({ text: "🔄 Atnaujinama kas 1 minutę" })
         .setTimestamp();
 
-    } catch (err) {
+    } catch {
       // 🔴 OFFLINE
       embed = new EmbedBuilder()
-        .setTitle("# 🔴 OneMc.lt Statusas 🔴")
+        .setTitle("🔴 OneMc.lt Statusas 🔴")
         .setColor(0xe74c3c)
         .setDescription(
           "**🌍 Serverio IP:**\n" +
-          "```playonemc.falixsrv.me```\n" +
+          "`playonemc.falixsrv.me`\n\n" +
           "**📦 Versija:**\n" +
-          "`" + MC_VERSION + "`\n"
+          "`" + MC_VERSION + "`"
         )
         .addFields(
           {
-            name: "**📊 Serverio būsena:**",
+            name: "📊 Serverio būsena",
             value: "🔴 OFFLINE",
             inline: false
           },
           {
-            name: "**👥 Žaidėjai:**",
+            name: "👥 Žaidėjai",
             value: "**0 / 64**",
             inline: false
           }
@@ -118,6 +118,9 @@ if (!data.online) {
   }
 }
 
+// =====================
+// READY
+// =====================
 client.once("ready", () => {
   console.log(`Prisijungta kaip ${client.user.tag}`);
   updateMcStatus();
