@@ -1,30 +1,42 @@
-import { REST, Routes, SlashCommandBuilder } from 'discord.js';
+import {
+  REST,
+  Routes,
+  SlashCommandBuilder,
+  PermissionsBitField
+} from "discord.js";
 
 const commands = [
   new SlashCommandBuilder()
-    .setName('announce')
-    .setDescription('Paskelbti pranešimą su embed')
+    .setName("announce")
+    .setDescription("Paskelbti pranešimą su embed")
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
     .addStringOption(opt =>
-      opt.setName('tekstas')
-        .setDescription('Žinutės tekstas')
+      opt.setName("title")
+        .setDescription("Announcement pavadinimas")
         .setRequired(true)
     )
     .addStringOption(opt =>
-      opt.setName('paveikslelis')
-        .setDescription('Paveiksliuko URL (nebūtina)')
+      opt.setName("tekstas")
+        .setDescription("Žinutės tekstas")
+        .setRequired(true)
+    )
+    .addStringOption(opt =>
+      opt.setName("paveikslelis")
+        .setDescription("Paveiksliuko URL (nebūtina)")
         .setRequired(false)
     ),
 
   new SlashCommandBuilder()
-    .setName('mcstatus')
-    .setDescription('Parodo Minecraft serverio statusą')
+    .setName("mcstatus")
+    .setDescription("Parodo Minecraft serverio statusą")
 ].map(c => c.toJSON());
 
-const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
+const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
 
 await rest.put(
   Routes.applicationCommands(process.env.CLIENT_ID),
   { body: commands }
 );
 
-console.log('✅ Slash komandos užregistruotos');
+console.log("✅ Slash komandos užregistruotos");
+
