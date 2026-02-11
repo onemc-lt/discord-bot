@@ -52,7 +52,7 @@ async function updateMcStatus() {
       const data = await getMcStatus();
 
       embed = new EmbedBuilder()
-        .setTitle("🟢 OneMc.lt Statusas 🟢")
+        .setTitle("# 🟢 OneMc.lt Statusas 🟢")
         .setColor(0x2ecc71)
         .setDescription(
           "**🌍 Serverio IP:**\n" +
@@ -62,13 +62,13 @@ async function updateMcStatus() {
         )
         .addFields(
           {
-            name: "📊 Serverio būsena",
+            name: "**📊 Serverio būsena:**",
             value: "🟢 ONLINE",
             inline: false
           },
           {
-            name: "👥 Žaidėjai",
-            value: `**${data.players.online} / 64**`,
+            name: "**👥 Žaidėjai:**",
+            value: `${data.players.online} / 64`,
             inline: false
           }
         )
@@ -78,7 +78,7 @@ async function updateMcStatus() {
     } catch {
       // 🔴 OFFLINE
       embed = new EmbedBuilder()
-        .setTitle("🔴 OneMc.lt Statusas 🔴")
+        .setTitle("# 🔴 OneMc.lt Statusas 🔴")
         .setColor(0xe74c3c)
         .setDescription(
           "**🌍 Serverio IP:**\n" +
@@ -88,13 +88,13 @@ async function updateMcStatus() {
         )
         .addFields(
           {
-            name: "📊 Serverio būsena",
+            name: "**📊 Serverio būsena:**",
             value: "🔴 OFFLINE",
             inline: false
           },
           {
-            name: "👥 Žaidėjai",
-            value: "**0 / 64**",
+            name: "**👥 Žaidėjai:**",
+            value: "0 / 64",
             inline: false
           }
         )
