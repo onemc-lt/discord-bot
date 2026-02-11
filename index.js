@@ -17,8 +17,16 @@ let statusMessage = null;
 
 async function getMcStatus() {
   const res = await fetch(`https://api.mcstatus.io/v2/status/java/${MC_HOST}`);
-  if (!res.ok) throw new Error("Server offline");
-  return res.json();
+  if (!res.ok) throw new Error("Fetch failed");
+
+  const data = await res.json();
+
+  // 🔴 jei serveris offline
+  if (!data.online) {
+    throw new Error("Server offline");
+  }
+
+  return data;
 }
 
 async function updateMcStatus() {
