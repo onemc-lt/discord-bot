@@ -40,23 +40,27 @@ async function updateMcStatus() {
       // 🟢 ONLINE
       const data = await getMcStatus();
 
+if (!data.online) {
+  throw new Error("Server offline");
       embed = new EmbedBuilder()
-        .setTitle("🟢 OneMc.lt Statusas")
+        
+        .setTitle("#🟢 OneMc.lt Statusas 🟢")
         .setColor(0x2ecc71)
         .setDescription(
           "**🌍 Serverio IP:**\n" +
           "```playonemc.falixsrv.me```\n" +
-          `**📦 Versija:** ${MC_VERSION}`
+          "**📦 Versija:**\n" +
+          "`" + MC_VERSION + "`\n"
         )
         .addFields(
           {
-            name: "📊 Serverio būsena",
-            value: "**🟢 ONLINE**",
+            name: "**📊 Serverio būsena:**",
+            value: "🟢 ONLINE",
             inline: false
           },
           {
-            name: "👥 Žaidėjai",
-            value: `**${data.players.online} / 64**`,
+            name: "**👥 Žaidėjai:**",
+            value: `${data.players.online} / 64`,
             inline: false
           }
         )
@@ -66,21 +70,22 @@ async function updateMcStatus() {
     } catch {
       // 🔴 OFFLINE
       embed = new EmbedBuilder()
-        .setTitle("🔴 OneMc.lt Statusas")
+        .setTitle("# 🔴 OneMc.lt Statusas 🔴")
         .setColor(0xe74c3c)
         .setDescription(
           "**🌍 Serverio IP:**\n" +
           "```playonemc.falixsrv.me```\n" +
-          `**📦 Versija:** ${MC_VERSION}`
+          "**📦 Versija:**\n" +
+          "`" + MC_VERSION + "`\n"
         )
         .addFields(
           {
-            name: "📊 Serverio būsena",
-            value: "**🔴 OFFLINE**",
+            name: "**📊 Serverio būsena:**",
+            value: "🔴 OFFLINE",
             inline: false
           },
           {
-            name: "👥 Žaidėjai",
+            name: "**👥 Žaidėjai:**",
             value: "**0 / 64**",
             inline: false
           }
