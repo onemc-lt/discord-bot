@@ -12,27 +12,35 @@ const commands = [
     .setDescription("Paskelbti announcement su embed")
     .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
 
+    // ✅ KANALO PASIRINKIMAS
     .addChannelOption(opt =>
-      opt.setName("kanalas")
+      opt
+        .setName("kanalas")
         .setDescription("Į kurį kanalą siųsti announcement")
         .addChannelTypes(ChannelType.GuildText)
         .setRequired(true)
     )
 
+    // ✅ TITLE
     .addStringOption(opt =>
-      opt.setName("title")
+      opt
+        .setName("title")
         .setDescription("Announcement pavadinimas")
         .setRequired(true)
     )
 
+    // ✅ TEKSTAS
     .addStringOption(opt =>
-      opt.setName("tekstas")
+      opt
+        .setName("tekstas")
         .setDescription("Announcement tekstas")
         .setRequired(true)
     )
 
+    // ✅ PAVEIKSLĖLIS (nebūtinas)
     .addStringOption(opt =>
-      opt.setName("paveikslelis")
+      opt
+        .setName("paveikslelis")
         .setDescription("Paveiksliuko URL (nebūtina)")
         .setRequired(false)
     ),
@@ -40,7 +48,6 @@ const commands = [
   new SlashCommandBuilder()
     .setName("mcstatus")
     .setDescription("Parodo Minecraft serverio statusą")
-
 ].map(c => c.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
@@ -50,4 +57,4 @@ await rest.put(
   { body: commands }
 );
 
-console.log("✅ Slash komandos užregistruotos");
+console.log("✅ Slash komandos atnaujintos");
