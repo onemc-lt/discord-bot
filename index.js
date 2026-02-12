@@ -1,4 +1,9 @@
-import { Client, GatewayIntentBits, EmbedBuilder } from "discord.js";
+import {
+  Client,
+  GatewayIntentBits,
+  EmbedBuilder,
+  PermissionsBitField
+} from "discord.js";
 
 const TOKEN = process.env.TOKEN;
 
@@ -7,9 +12,7 @@ const MC_HOST = "playonemc.falixsrv.me";
 const MC_VERSION = "1.21.11";
 
 // █ Discord
-const STATUS_CHANNEL_ID = "1470099282735661068"; // statusas
-const ANNOUNCE_CHANNEL_ID = "1470034064290615510"; // announcement
-
+const STATUS_CHANNEL_ID = "1470099282735661068"; // statuso kanalas
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
@@ -38,7 +41,7 @@ async function updateMcStatus() {
     const channel = await client.channels.fetch(STATUS_CHANNEL_ID);
     if (!channel) return;
 
-    // randam seną statuso žinutę
+    // rasti seną statuso žinutę
     if (!statusMessage) {
       const messages = await channel.messages.fetch({ limit: 20 });
       statusMessage =
@@ -64,12 +67,12 @@ async function updateMcStatus() {
         )
         .addFields(
           {
-            name: "**📊 Serverio būsena:**",
+            name: "📊 Serverio būsena",
             value: "🟢 ONLINE",
             inline: false
           },
           {
-            name: "**👥 Žaidėjai:**",
+            name: "👥 Žaidėjai",
             value: `${data.players.online} / 64`,
             inline: false
           }
@@ -90,12 +93,12 @@ async function updateMcStatus() {
         )
         .addFields(
           {
-            name: "**📊 Serverio būsena:**",
+            name: "📊 Serverio būsena",
             value: "🔴 OFFLINE",
             inline: false
           },
           {
-            name: "**👥 Žaidėjai:**",
+            name: "👥 Žaidėjai",
             value: "0 / 64",
             inline: false
           }
@@ -104,7 +107,7 @@ async function updateMcStatus() {
         .setTimestamp();
     }
 
-    // redaguojam arba kuriam
+    // redaguoti arba kurti
     if (statusMessage) {
       try {
         await statusMessage.edit({ embeds: [embed] });
@@ -120,8 +123,6 @@ async function updateMcStatus() {
   }
 }
 
-import { PermissionsBitField } from "discord.js";
-
 // =====================
 // ANNOUNCE COMMAND
 // =====================
@@ -130,24 +131,21 @@ client.on("interactionCreate", async interaction => {
   if (interaction.commandName !== "announce") return;
 
   // 🔒 Tik administratoriai
-  if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
+  if (
+    !interaction.member.permissions.has(
+      PermissionsBitField.Flags.Administrator
+    )
+  ) {
     return interaction.reply({
       content: "❌ Šią komandą gali naudoti tik administratoriai.",
       ephemeral: true
     });
   }
 
+  const channel = interaction.options.getChannel("kanalas");
   const title = interaction.options.getString("title");
   const tekstas = interaction.options.getString("tekstas");
   const paveikslelis = interaction.options.getString("paveikslelis");
-
-  const channel = await client.channels.fetch(ANNOUNCE_CHANNEL_ID);
-  if (!channel) {
-    return interaction.reply({
-      content: "❌ Announcement kanalas nerastas.",
-      ephemeral: true
-    });
-  }
 
   const embed = new EmbedBuilder()
     .setTitle(title)
@@ -155,27 +153,23 @@ client.on("interactionCreate", async interaction => {
     .setColor(0x3498db)
     .setTimestamp();
 
-  if (paveikslelis) {
-    embed.setImage(paveikslelis);
-  }
+  if (paveikslelis) embed.setImage(paveikslelis);
 
   await channel.send({ embeds: [embed] });
 
   await interaction.reply({
-    content: "✅ Announcement išsiųstas.",
+    content: `✅ Announcement išsiųstas į ${channel}`,
     ephemeral: true
   });
 });
-
 
 // =====================
 // READY
 // =====================
 client.once("ready", () => {
-  console.log(`Prisijungta kaip ${client.user.tag}`);
+  console.log(`✅ Prisijungta kaip ${client.user.tag}`);
   updateMcStatus();
   setInterval(updateMcStatus, 60_000);
 });
 
 client.login(TOKEN);
-
