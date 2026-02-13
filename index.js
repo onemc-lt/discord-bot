@@ -5,6 +5,8 @@ import {
   PermissionsBitField
 } from "discord.js";
 
+import "./commands.js";
+
 const TOKEN = process.env.TOKEN;
 
 // █ Minecraft
