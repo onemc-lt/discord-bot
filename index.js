@@ -10,7 +10,7 @@ import "./commands.js";
 const TOKEN = process.env.TOKEN;
 
 // █ Minecraft
-const MC_HOST = "playonemc.falixsrv.me";
+const MC_HOST = "playonemc.aternos.me";
 const MC_VERSION = "1.21.11";
 
 // █ Discord
@@ -59,22 +59,22 @@ async function updateMcStatus() {
       const data = await getMcStatus();
 
       embed = new EmbedBuilder()
-        .setTitle("# 🟢 OneMc.lt Statusas 🟢")
+        .setTitle("**🟢 OneMc.lt Statusas 🟢**")
         .setColor(0x2ecc71)
         .setDescription(
           "**🌍 Serverio IP:**\n" +
-          "`playonemc.falixsrv.me`\n\n" +
-          "**📦 Versija:**\n" +
+          "`play.onemc.lt`\n\n" +
+          "**📌 Versija:**\n" +
           "`" + MC_VERSION + "`"
         )
         .addFields(
           {
-            name: "📊 Serverio būsena",
+            name: "**📈 Serverio būsena:**",
             value: "🟢 ONLINE",
             inline: false
           },
           {
-            name: "👥 Žaidėjai",
+            name: "**👥 Žaidėjai:**",
             value: `${data.players.online} / 64`,
             inline: false
           }
@@ -85,22 +85,22 @@ async function updateMcStatus() {
     } catch {
       // 🔴 OFFLINE
       embed = new EmbedBuilder()
-        .setTitle("# 🔴 OneMc.lt Statusas 🔴")
+        .setTitle("**🔴 OneMc.lt Statusas 🔴**")
         .setColor(0xe74c3c)
         .setDescription(
           "**🌍 Serverio IP:**\n" +
-          "`playonemc.falixsrv.me`\n\n" +
-          "**📦 Versija:**\n" +
+          "`play.onemc.lt`\n\n" +
+          "**📌 Versija:**\n" +
           "`" + MC_VERSION + "`"
         )
         .addFields(
           {
-            name: "📊 Serverio būsena",
+            name: "**📉 Serverio būsena:**",
             value: "🔴 OFFLINE",
             inline: false
           },
           {
-            name: "👥 Žaidėjai",
+            name: "**👥 Žaidėjai:**",
             value: "0 / 64",
             inline: false
           }
