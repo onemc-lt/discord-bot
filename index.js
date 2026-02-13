@@ -23,12 +23,13 @@ const client = new Client({
 let statusMessage = null;
 
 // =====================
-// MC STATUS FETCH
+// MC STATUS FETCH (mcsrvstat API)
 // =====================
 async function getMcStatus() {
   try {
-    const res = await fetch(`https://api.mcstatus.io/v2/status/java/${MC_HOST}`);
+    const res = await fetch(`https://api.mcsrvstat.us/2/${MC_HOST}`);
     if (!res.ok) throw new Error("Fetch failed");
+
     return await res.json();
   } catch (err) {
     console.error("API klaida:", err);
@@ -56,7 +57,7 @@ async function updateMcStatus() {
     let embed;
 
     if (data && data.online && data.players && data.players.online > 0) {
-
+      
       // 🟢 ONLINE
       embed = new EmbedBuilder()
         .setTitle("🟢 OneMc.lt Statusas 🟢")
