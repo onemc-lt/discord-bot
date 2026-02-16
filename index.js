@@ -10,7 +10,7 @@ import "./commands.js";
 const TOKEN = process.env.TOKEN;
 
 // █ Minecraft
-const MC_HOST = "playonemc.aternos.me";
+const MC_HOST = "65.108.224.31:26101";
 const MC_VERSION = "1.21.11";
 
 // █ Discord
@@ -60,12 +60,12 @@ async function updateMcStatus() {
       
       // 🟢 ONLINE
       embed = new EmbedBuilder()
-        .setTitle("🟢 OneMc.lt Statusas 🟢")
+        .setTitle("**🟢 OneMc.lt Statusas 🟢**")
         .setColor(0x2ecc71)
         .setDescription(
-          "**🌍 Serverio IP:**\n" +
+          "**🌍 Serverio IP:**"
           "`play.onemc.lt`\n\n" +
-          "**📌 Versija:**\n" +
+          "**📌 Versija:**"
           "`" + MC_VERSION + "`"
         )
         .addFields(
@@ -87,12 +87,12 @@ async function updateMcStatus() {
 
       // 🔴 OFFLINE (0 žaidėjų ARBA API klaida)
       embed = new EmbedBuilder()
-        .setTitle("🔴 OneMc.lt Statusas 🔴")
+        .setTitle("**🔴 OneMc.lt Statusas 🔴**")
         .setColor(0xe74c3c)
         .setDescription(
-          "**🌍 Serverio IP:**\n" +
+          "**🌍 Serverio IP:**"
           "`play.onemc.lt`\n\n" +
-          "**📌 Versija:**\n" +
+          "**📌 Versija:**"
           "`" + MC_VERSION + "`"
         )
         .addFields(
