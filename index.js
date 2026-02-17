@@ -58,7 +58,7 @@ async function updateMcStatus() {
     if (data && data.online === true) {
       // 🟢 ONLINE
       embed = new EmbedBuilder()
-        .setTitle("## **🟢 OneMc.lt Statusas 🟢**")
+        .setTitle("**🟢 OneMc.lt Statusas 🟢**")
         .setColor(0x2ecc71)
         .addFields(
           {
@@ -72,7 +72,7 @@ async function updateMcStatus() {
             inline: false
           },
           {
-            name: "## **📈 Serverio būsena:**",
+            name: "**📈 Serverio būsena:**",
             value: "🟢 ONLINE",
             inline: false
           },
