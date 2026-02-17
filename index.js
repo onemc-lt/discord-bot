@@ -10,8 +10,8 @@ import "./commands.js";
 const TOKEN = process.env.TOKEN;
 
 // █ Minecraft
-const MC_HOST = "65.108.224.31:26101";
-const MC_VERSION = "1.21.11";
+const MC_HOST = "play.onemc.lt";
+const MC_VERSION = "1.21.8";
 
 // █ Discord
 const STATUS_CHANNEL_ID = "1470099282735661068";
@@ -23,13 +23,12 @@ const client = new Client({
 let statusMessage = null;
 
 // =====================
-// MC STATUS FETCH (mcsrvstat API)
+// MC STATUS FETCH
 // =====================
 async function getMcStatus() {
   try {
     const res = await fetch(`https://api.mcsrvstat.us/2/${MC_HOST}`);
     if (!res.ok) throw new Error("Fetch failed");
-
     return await res.json();
   } catch (err) {
     console.error("API klaida:", err);
@@ -56,27 +55,29 @@ async function updateMcStatus() {
     const data = await getMcStatus();
     let embed;
 
-    if (data && data.online && data.players && data.players.online > 0) {
-      
+    if (data && data.online === true) {
       // 🟢 ONLINE
       embed = new EmbedBuilder()
         .setTitle("**🟢 OneMc.lt Statusas 🟢**")
         .setColor(0x2ecc71)
         .setDescription(
-          "**🌍 Serverio IP:**"
-          "`play.onemc.lt`\n\n" +
-          "**📌 Versija:**"
-          "`" + MC_VERSION + "`"
+`🌍 Serverio IP:
+play.onemc.lt
+
+📌 Versija:
+${MC_VERSION}`
         )
         .addFields(
           {
-            name: "**📈 Serverio būsena:**",
+            name: "📈 Serverio būsena:",
             value: "🟢 ONLINE",
             inline: false
           },
           {
-            name: "**👥 Žaidėjai:**",
-            value: `${data.players.online} / 64`,
+            name: "👥 Žaidėjai:",
+            value: data.players
+              ? `${data.players.online} / 64`
+              : "0 / 64",
             inline: false
           }
         )
@@ -84,25 +85,25 @@ async function updateMcStatus() {
         .setTimestamp();
 
     } else {
-
-      // 🔴 OFFLINE (0 žaidėjų ARBA API klaida)
+      // 🔴 OFFLINE
       embed = new EmbedBuilder()
         .setTitle("**🔴 OneMc.lt Statusas 🔴**")
         .setColor(0xe74c3c)
         .setDescription(
-          "**🌍 Serverio IP:**"
-          "`play.onemc.lt`\n\n" +
-          "**📌 Versija:**"
-          "`" + MC_VERSION + "`"
+`🌍 Serverio IP:
+play.onemc.lt
+
+📌 Versija:
+${MC_VERSION}`
         )
         .addFields(
           {
-            name: "**📉 Serverio būsena:**",
+            name: "📉 Serverio būsena:",
             value: "🔴 OFFLINE",
             inline: false
           },
           {
-            name: "**👥 Žaidėjai:**",
+            name: "👥 Žaidėjai:",
             value: "0 / 64",
             inline: false
           }
@@ -133,7 +134,6 @@ client.on("interactionCreate", async interaction => {
   if (!interaction.isChatInputCommand()) return;
   if (interaction.commandName !== "announce") return;
 
-  // 🔒 Tik administratoriai
   if (
     !interaction.member.permissions.has(
       PermissionsBitField.Flags.Administrator
