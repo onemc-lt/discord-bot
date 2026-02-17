@@ -58,23 +58,26 @@ async function updateMcStatus() {
     if (data && data.online === true) {
       // 🟢 ONLINE
       embed = new EmbedBuilder()
-        .setTitle("**🟢 OneMc.lt Statusas 🟢**")
+        .setTitle("## **🟢 OneMc.lt Statusas 🟢**")
         .setColor(0x2ecc71)
-        .setDescription(
-`🌍 Serverio IP:
-play.onemc.lt
-
-📌 Versija:
-${MC_VERSION}`
-        )
         .addFields(
           {
-            name: "📈 Serverio būsena:",
+            name: "**🌍 Serverio IP:**",
+            value: "play.onemc.lt",
+            inline: false
+          },
+          {
+            name: "**📌 Versija:**",
+            value: MC_VERSION,
+            inline: false
+          },
+          {
+            name: "## **📈 Serverio būsena:**",
             value: "🟢 ONLINE",
             inline: false
           },
           {
-            name: "👥 Žaidėjai:",
+            name: "**👥 Žaidėjai:**",
             value: data.players
               ? `${data.players.online} / 64`
               : "0 / 64",
@@ -89,21 +92,24 @@ ${MC_VERSION}`
       embed = new EmbedBuilder()
         .setTitle("**🔴 OneMc.lt Statusas 🔴**")
         .setColor(0xe74c3c)
-        .setDescription(
-`🌍 Serverio IP:
-play.onemc.lt
-
-📌 Versija:
-${MC_VERSION}`
-        )
         .addFields(
           {
-            name: "📉 Serverio būsena:",
+            name: "**🌍 Serverio IP:**",
+            value: "play.onemc.lt",
+            inline: false
+          },
+          {
+            name: "**📌 Versija:**",
+            value: MC_VERSION,
+            inline: false
+          },
+          {
+            name: "**📉 Serverio būsena:**",
             value: "🔴 OFFLINE",
             inline: false
           },
           {
-            name: "👥 Žaidėjai:",
+            name: "**👥 Žaidėjai:**",
             value: "0 / 64",
             inline: false
           }
