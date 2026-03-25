@@ -5,6 +5,7 @@ import {
   PermissionsBitField
 } from "discord.js";
 
+import express from "express";
 import "./commands.js";
 
 const TOKEN = process.env.TOKEN;
@@ -58,26 +59,26 @@ async function updateMcStatus() {
     if (data && data.online === true) {
       // 🟢 ONLINE
       embed = new EmbedBuilder()
-        .setTitle("**🟢 OneMc.lt Statusas 🟢**")
+        .setTitle("🟢 OneMc.lt Statusas")
         .setColor(0x2ecc71)
         .addFields(
           {
-            name: "**🌍 Serverio IP:**",
+            name: "🌍 Serverio IP:",
             value: "play.onemc.lt",
             inline: false
           },
           {
-            name: "**📌 Versija:**",
+            name: "📌 Versija:",
             value: MC_VERSION,
             inline: false
           },
           {
-            name: "**📈 Serverio būsena:**",
+            name: "📈 Serverio būsena:",
             value: "🟢 ONLINE",
             inline: false
           },
           {
-            name: "**👥 Žaidėjai:**",
+            name: "👥 Žaidėjai:",
             value: data.players
               ? `${data.players.online} / 64`
               : "0 / 64",
@@ -90,26 +91,26 @@ async function updateMcStatus() {
     } else {
       // 🔴 OFFLINE
       embed = new EmbedBuilder()
-        .setTitle("**🔴 OneMc.lt Statusas 🔴**")
+        .setTitle("🔴 OneMc.lt Statusas")
         .setColor(0xe74c3c)
         .addFields(
           {
-            name: "**🌍 Serverio IP:**",
+            name: "🌍 Serverio IP:",
             value: "play.onemc.lt",
             inline: false
           },
           {
-            name: "**📌 Versija:**",
+            name: "📌 Versija:",
             value: MC_VERSION,
             inline: false
           },
           {
-            name: "**📉 Serverio būsena:**",
+            name: "📉 Serverio būsena:",
             value: "🔴 OFFLINE",
             inline: false
           },
           {
-            name: "**👥 Žaidėjai:**",
+            name: "👥 Žaidėjai:",
             value: "0 / 64",
             inline: false
           }
@@ -181,4 +182,22 @@ client.once("ready", () => {
   setInterval(updateMcStatus, 60_000);
 });
 
+// =====================
+// RENDER FREE WEB SERVER
+// =====================
+const app = express();
+
+app.get("/", (req, res) => {
+  res.send("OneMc Discord bot is running");
+});
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`🌐 Web serveris veikia ant porto ${PORT}`);
+});
+
+// =====================
+// LOGIN
+// =====================
 client.login(TOKEN);
