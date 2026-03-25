@@ -6,6 +6,7 @@ import {
 } from "discord.js";
 
 import express from "express";
+import fetch from "node-fetch"; // <- svarbu
 import "./commands.js";
 
 const TOKEN = process.env.TOKEN;
@@ -22,6 +23,21 @@ const client = new Client({
 });
 
 let statusMessage = null;
+
+// =====================
+// EXPRESS (PALEIDŽIAM PIRMA)
+// =====================
+const app = express();
+
+app.get("/", (req, res) => {
+  res.send("OneMc Discord bot is running");
+});
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`🌐 Web serveris veikia ant porto ${PORT}`);
+});
 
 // =====================
 // MC STATUS FETCH
@@ -57,63 +73,31 @@ async function updateMcStatus() {
     let embed;
 
     if (data && data.online === true) {
-      // 🟢 ONLINE
       embed = new EmbedBuilder()
         .setTitle("🟢 OneMc.lt Statusas")
         .setColor(0x2ecc71)
         .addFields(
-          {
-            name: "🌍 Serverio IP:",
-            value: "play.onemc.lt",
-            inline: false
-          },
-          {
-            name: "📌 Versija:",
-            value: MC_VERSION,
-            inline: false
-          },
-          {
-            name: "📈 Serverio būsena:",
-            value: "🟢 ONLINE",
-            inline: false
-          },
+          { name: "🌍 Serverio IP:", value: MC_HOST },
+          { name: "📌 Versija:", value: MC_VERSION },
+          { name: "📈 Serverio būsena:", value: "🟢 ONLINE" },
           {
             name: "👥 Žaidėjai:",
             value: data.players
               ? `${data.players.online} / 64`
-              : "0 / 64",
-            inline: false
+              : "0 / 64"
           }
         )
         .setFooter({ text: "🔄 Atnaujinama kas 1 minutę" })
         .setTimestamp();
-
     } else {
-      // 🔴 OFFLINE
       embed = new EmbedBuilder()
         .setTitle("🔴 OneMc.lt Statusas")
         .setColor(0xe74c3c)
         .addFields(
-          {
-            name: "🌍 Serverio IP:",
-            value: "play.onemc.lt",
-            inline: false
-          },
-          {
-            name: "📌 Versija:",
-            value: MC_VERSION,
-            inline: false
-          },
-          {
-            name: "📉 Serverio būsena:",
-            value: "🔴 OFFLINE",
-            inline: false
-          },
-          {
-            name: "👥 Žaidėjai:",
-            value: "0 / 64",
-            inline: false
-          }
+          { name: "🌍 Serverio IP:", value: MC_HOST },
+          { name: "📌 Versija:", value: MC_VERSION },
+          { name: "📉 Serverio būsena:", value: "🔴 OFFLINE" },
+          { name: "👥 Žaidėjai:", value: "0 / 64" }
         )
         .setFooter({ text: "🔄 Atnaujinama kas 1 minutę" })
         .setTimestamp();
@@ -135,7 +119,7 @@ async function updateMcStatus() {
 }
 
 // =====================
-// ANNOUNCE COMMAND
+// ANNOUNCE
 // =====================
 client.on("interactionCreate", async interaction => {
   if (!interaction.isChatInputCommand()) return;
@@ -147,7 +131,7 @@ client.on("interactionCreate", async interaction => {
     )
   ) {
     return interaction.reply({
-      content: "❌ Šią komandą gali naudoti tik administratoriai.",
+      content: "❌ Tik administratoriams.",
       ephemeral: true
     });
   }
@@ -168,7 +152,7 @@ client.on("interactionCreate", async interaction => {
   await channel.send({ embeds: [embed] });
 
   await interaction.reply({
-    content: `✅ Announcement išsiųstas į ${channel}`,
+    content: `✅ Išsiųsta į ${channel}`,
     ephemeral: true
   });
 });
@@ -179,22 +163,7 @@ client.on("interactionCreate", async interaction => {
 client.once("ready", () => {
   console.log(`✅ Prisijungta kaip ${client.user.tag}`);
   updateMcStatus();
-  setInterval(updateMcStatus, 60_000);
-});
-
-// =====================
-// RENDER FREE WEB SERVER
-// =====================
-const app = express();
-
-app.get("/", (req, res) => {
-  res.send("OneMc Discord bot is running");
-});
-
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`🌐 Web serveris veikia ant porto ${PORT}`);
+  setInterval(updateMcStatus, 60000);
 });
 
 // =====================
