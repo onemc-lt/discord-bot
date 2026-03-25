@@ -11,8 +11,6 @@ const commands = [
     .setName("announce")
     .setDescription("Paskelbti announcement su embed")
     .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
-
-    // ✅ KANALO PASIRINKIMAS
     .addChannelOption(opt =>
       opt
         .setName("kanalas")
@@ -20,31 +18,24 @@ const commands = [
         .addChannelTypes(ChannelType.GuildText)
         .setRequired(true)
     )
-
-    // ✅ TITLE
     .addStringOption(opt =>
       opt
         .setName("title")
         .setDescription("Announcement pavadinimas")
         .setRequired(true)
     )
-
-    // ✅ TEKSTAS
     .addStringOption(opt =>
       opt
         .setName("tekstas")
         .setDescription("Announcement tekstas")
         .setRequired(true)
     )
-
-    // ✅ PAVEIKSLĖLIS (nebūtinas)
     .addStringOption(opt =>
       opt
         .setName("paveikslelis")
         .setDescription("Paveiksliuko URL (nebūtina)")
         .setRequired(false)
     ),
-
   new SlashCommandBuilder()
     .setName("mcstatus")
     .setDescription("Parodo Minecraft serverio statusą")
@@ -52,9 +43,16 @@ const commands = [
 
 const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
 
-await rest.put(
-  Routes.applicationCommands(process.env.CLIENT_ID),
-  { body: commands }
-);
+async function registerCommands() {
+  try {
+    await rest.put(
+      Routes.applicationCommands(process.env.CLIENT_ID),
+      { body: commands }
+    );
+    console.log("✅ Slash komandos atnaujintos");
+  } catch (err) {
+    console.error("❌ Komandų registracija nepavyko:", err);
+  }
+}
 
-console.log("✅ Slash komandos atnaujintos");
+registerCommands();
